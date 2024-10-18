@@ -1,77 +1,193 @@
-{% load static %}
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Python Learning App</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python Learning App</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <style>
+        body {
+            background-color: black;
+            color: white;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #1a1a1a;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            color: white;
+            background-color: gold;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-align: center;
+            font-weight: bold;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+        .btn:disabled {
+            background-color: grey;
+            cursor: not-allowed;
+        }
+        .avatar {
+            width: 80px;
+            height: 80px;
+            background-color: grey;
+            border-radius: 50%;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+        .avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .level, .coins {
+            font-size: 18px;
+            font-weight: bold;
+            color: gold;
+            text-align: center;
+        }
+        .question {
+            margin-bottom: 20px;
+        }
+    </style>
 </head>
-<body class="bg-dark text-white">
-  <div class="container d-flex justify-content-center align-items-center min-vh-100">
-    <div class="card bg-secondary text-white shadow-lg" style="width: 100%; max-width: 400px;">
-      <div class="card-body">
-        <!-- Language toggle button -->
-        <div class="d-flex justify-content-end mb-3">
-          <button id="languageToggle" class="btn btn-outline-gold">
-            <i class="fas fa-globe"></i> <span id="languageLabel">Select Language</span>
-          </button>
-        </div>
+<body>
 
-        <!-- User avatar and name -->
-        <div class="text-center mb-4">
-          <div class="avatar-wrapper mb-2">
-            <div id="avatar" class="avatar bg-dark rounded-circle d-flex justify-content-center align-items-center">
-              <i class="fas fa-user text-gold" id="userIcon"></i>
-            </div>
-            <input type="file" id="fileUpload" class="d-none" accept="image/*">
-          </div>
-          <h2 id="username" class="text-gold">User</h2>
-        </div>
-
-        <!-- Stats: Level and Coins -->
-        <div class="d-flex justify-content-between mb-4">
-          <div class="text-center">
-            <p class="small text-muted" id="levelText">Level</p>
-            <p id="level" class="font-weight-bold">1</p>
-          </div>
-          <div class="text-center">
-            <p class="small text-muted" id="coinsText">Coins</p>
-            <p id="coins" class="font-weight-bold">0</p>
-          </div>
-        </div>
-
-        <!-- Course Buttons -->
-        <div id="courseSection" class="d-flex flex-column gap-3">
-          <button id="course1Btn" class="btn btn-outline-gold">Course 1: Python Basics</button>
-          <button class="btn btn-outline-secondary" disabled>Course 2 (Coming Soon)</button>
-          <button class="btn btn-outline-secondary" disabled>Course 3 (Coming Soon)</button>
-        </div>
-
-        <!-- Python Course Content -->
-        <div id="courseContent" class="d-none">
-          <h3 id="lessonTitle" class="font-weight-bold"></h3>
-          <p id="lessonContent"></p>
-          <button id="nextLessonBtn" class="btn btn-outline-gold">Next Lesson</button>
-        </div>
-
-        <!-- Python Quiz -->
-        <div id="quizSection" class="d-none">
-          <h3 class="font-weight-bold" id="quizTitle">Python Quiz</h3>
-          <div id="quizQuestions"></div>
-          <div id="quizResult" class="d-none mt-3">
-            <p id="quizCompletedText"></p>
-          </div>
-        </div>
-      </div>
+<div class="container">
+    <!-- Логика выбора языка -->
+    <div class="language-select">
+        <button id="toggleLanguage" class="btn">Select Language</button>
     </div>
-  </div>
 
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="{% static 'js/app.js' %}"></script>
+    <!-- Аватар и информация о пользователе -->
+    <div class="avatar" id="avatarContainer">
+        <img id="avatarImage" src="{% static 'images/default-avatar.png' %}" alt="User Avatar">
+    </div>
+    <input type="file" id="fileInput" style="display: none;">
+    <h2 class="username" id="username">User</h2>
+
+    <!-- Уровень и монеты -->
+    <div class="level">
+        <p id="level">Level: 1</p>
+    </div>
+    <div class="coins">
+        <p id="coins">Coins: 0</p>
+    </div>
+
+    <!-- Курсы и викторина -->
+    <div id="courses">
+        <button class="btn" onclick="startCourse(1)">Course 1: Python Basics</button>
+        <button class="btn" disabled>Course 2 (Coming Soon)</button>
+        <button class="btn" disabled>Course 3 (Coming Soon)</button>
+    </div>
+
+    <!-- Викторина -->
+    <div id="quiz" style="display: none;">
+        <div class="question">
+            <p id="questionText"></p>
+        </div>
+        <div id="optionsContainer"></div>
+    </div>
+
+    <div id="quizResults" style="display: none;">
+        <p id="quizCompletedMessage"></p>
+    </div>
+
+</div>
+
+<!-- JavaScript -->
+<script>
+    const translations = {
+        en: {
+            user: "User",
+            level: "Level",
+            coins: "Coins",
+            course1: "Course 1: Python Basics",
+            course2: "Course 2 (Coming Soon)",
+            course3: "Course 3 (Coming Soon)",
+            nextLesson: "Next Lesson",
+            takeQuiz: "Take Quiz",
+            pythonQuiz: "Python Quiz",
+            quizCompleted: "Quiz completed! You earned",
+            coinsEarned: "coins and advanced to level",
+            tryAgain: "Try again",
+            languageSelect: "Select Language",
+        },
+        ru: {
+            user: "Пользователь",
+            level: "Уровень",
+            coins: "Монеты",
+            course1: "Курс 1: Основы Python",
+            course2: "Курс 2 (Скоро)",
+            course3: "Курс 3 (Скоро)",
+            nextLesson: "Следующий урок",
+            takeQuiz: "Пройти тест",
+            pythonQuiz: "Тест по Python",
+            quizCompleted: "Тест завершен! Вы заработали",
+            coinsEarned: "монет и достигли уровня",
+            tryAgain: "Попробовать снова",
+            languageSelect: "Выберите язык",
+        }
+    };
+
+    let language = 'en';
+    let currentQuizIndex = 0;
+    const pythonQuiz = {
+        en: [
+            { question: "What is Python?", options: ["A snake", "A programming language"], correct: 1 },
+        ],
+        ru: [
+            { question: "Что такое Python?", options: ["Змея", "Язык программирования"], correct: 1 },
+        ]
+    };
+
+    document.getElementById('toggleLanguage').addEventListener('click', toggleLanguage);
+
+    function toggleLanguage() {
+        language = language === 'en' ? 'ru' : 'en';
+        document.getElementById('toggleLanguage').textContent = translations[language].languageSelect;
+        document.getElementById('username').textContent = translations[language].user;
+        updateQuiz();
+    }
+
+    function startCourse() {
+        document.getElementById('courses').style.display = 'none';
+        document.getElementById('quiz').style.display = 'block';
+        updateQuiz();
+    }
+
+    function updateQuiz() {
+        const quizData = pythonQuiz[language][currentQuizIndex];
+        document.getElementById('questionText').textContent = quizData.question;
+
+        const optionsContainer = document.getElementById('optionsContainer');
+        optionsContainer.innerHTML = '';
+        quizData.options.forEach((option, index) => {
+            const button = document.createElement('button');
+            button.textContent = option;
+            button.classList.add('btn');
+            button.onclick = () => checkAnswer(index, quizData.correct);
+            optionsContainer.appendChild(button);
+        });
+    }
+
+    function checkAnswer(selected, correct) {
+        if (selected === correct) {
+            alert('Correct!');
+        } else {
+            alert('Wrong!');
+        }
+    }
+</script>
+
 </body>
 </html>

@@ -20,5 +20,6 @@ from django.urls import path, include
 urlpatterns = [
     path('webhook/', include('telegrambot.urls')),  # URL для Telegram вебхука
     path('', include('telegrambot.urls')),         # URL для мини-приложения
+    path('admin/', admin.site.urls),
 ]
 
