@@ -1,184 +1,35 @@
+{% load static %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Python Learning App</title>
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
-  <style>
-    .text-gold {
-      color: #FFD700;
-    }
-    .bg-gold {
-      background-color: #FFD700;
-    }
-    .bg-gray-800 {
-      background-color: #2D2D2D;
-    }
-  </style>
+  <link rel="stylesheet" href="styles.css">
 </head>
-<body class="bg-black text-white">
-
-  <div class="flex justify-center items-center min-h-screen">
-    <div class="w-full max-w-md p-6 bg-gray-900 rounded-lg shadow-lg" id="app">
-      <!-- User Info -->
-      <div class="flex flex-col items-center mb-6">
-        <div id="avatar-container" class="w-20 h-20 bg-gray-800 rounded-full flex items-center justify-center mb-2 overflow-hidden cursor-pointer">
-          <img id="avatar" class="w-full h-full object-cover hidden" alt="User Avatar">
-          <svg id="default-avatar" class="w-12 h-12 text-gold" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
-          </svg>
-        </div>
-        <input type="file" id="file-input" class="hidden" accept="image/*" />
-        <h2 id="name" class="text-2xl font-bold text-gold">User</h2>
+<body>
+  <div class="container">
+    <div class="header">
+      <button id="language-toggle" class="btn">Select Language</button>
+    </div>
+    <div class="profile">
+      <div class="avatar" id="avatar"></div>
+      <input type="file" id="file-upload" class="hidden" accept="image/*">
+      <h2 id="username">User</h2>
+    </div>
+    <div class="stats">
+      <div class="stat">
+        <p>Level</p>
+        <p id="level">1</p>
       </div>
-
-      <!-- Level and Coins Info -->
-      <div class="flex justify-between mb-6">
-        <div class="text-center">
-          <p class="text-sm text-gray-400">Level</p>
-          <p id="level" class="text-xl font-bold">1</p>
-        </div>
-        <div class="text-center">
-          <p class="text-sm text-gray-400">Coins</p>
-          <p id="coins" class="text-xl font-bold">0</p>
-        </div>
-      </div>
-
-      <!-- Course Selection -->
-      <div id="course-selection" class="space-y-4">
-        <button id="start-course" class="w-full py-3 bg-gold text-black font-bold rounded-lg transition-transform transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-gold focus:ring-opacity-50">
-          Course 1: Python Basics
-        </button>
-        <button class="w-full py-3 bg-gray-700 text-white font-bold rounded-lg transition-transform transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50" disabled>
-          Course 2 (Coming Soon)
-        </button>
-        <button class="w-full py-3 bg-gray-700 text-white font-bold rounded-lg transition-transform transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50" disabled>
-          Course 3 (Coming Soon)
-        </button>
-      </div>
-
-      <!-- Course Content -->
-      <div id="course-content" class="space-y-4 hidden">
-        <h3 id="lesson-title" class="text-xl font-bold">Lesson Title</h3>
-        <p id="lesson-content">Lesson Content</p>
-        <button id="next-lesson" class="w-full py-3 bg-gold text-black font-bold rounded-lg transition-transform transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-gold focus:ring-opacity-50">
-          Next Lesson
-        </button>
-      </div>
-
-      <!-- Quiz Section -->
-      <div id="quiz-section" class="space-y-4 hidden">
-        <h3 class="text-xl font-bold">Python Quiz</h3>
-        <div id="quiz-content"></div>
+      <div class="stat">
+        <p>Coins</p>
+        <p id="coins">0</p>
       </div>
     </div>
+    <div id="content"></div>
+    <script src="script.js"></script>
   </div>
-
-  <script>
-    const pythonTheory = [
-      { id: 1, title: "Introduction to Python", content: "Python is a high-level, interpreted programming language..." },
-      { id: 2, title: "Variables and Data Types", content: "In Python, variables are created when you assign a value to them..." },
-      { id: 3, title: "Control Structures", content: "Python uses indentation to define code blocks for control structures like if, for, and while..." },
-    ];
-
-    const pythonQuiz = [
-      { question: "What is Python?", options: ["A snake", "A programming language", "A type of coffee", "A planet"], correctAnswer: 1 },
-      { question: "Which of the following is a valid variable name in Python?", options: ["2variable", "_variable", "variable-name", "variable name"], correctAnswer: 1 },
-      { question: "How do you create a comment in Python?", options: ["// This is a comment", "/* This is a comment */", "# This is a comment", "-- This is a comment"], correctAnswer: 2 }
-    ];
-
-    let name = "User";
-    let level = 1;
-    let coins = 0;
-    let currentLesson = 0;
-    let quizScore = 0;
-    const avatarContainer = document.getElementById('avatar-container');
-    const avatarImage = document.getElementById('avatar');
-    const defaultAvatar = document.getElementById('default-avatar');
-    const fileInput = document.getElementById('file-input');
-    const startCourseBtn = document.getElementById('start-course');
-    const courseContent = document.getElementById('course-content');
-    const nextLessonBtn = document.getElementById('next-lesson');
-    const quizSection = document.getElementById('quiz-section');
-    const quizContent = document.getElementById('quiz-content');
-    const levelDisplay = document.getElementById('level');
-    const coinsDisplay = document.getElementById('coins');
-    const courseSelection = document.getElementById('course-selection');
-    const lessonTitle = document.getElementById('lesson-title');
-    const lessonContent = document.getElementById('lesson-content');
-
-    fileInput.addEventListener('change', (event) => {
-      const file = event.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          avatarImage.src = reader.result;
-          avatarImage.classList.remove('hidden');
-          defaultAvatar.classList.add('hidden');
-        };
-        reader.readAsDataURL(file);
-      }
-    });
-
-    startCourseBtn.addEventListener('click', () => {
-      courseSelection.classList.add('hidden');
-      courseContent.classList.remove('hidden');
-      loadLesson();
-    });
-
-    nextLessonBtn.addEventListener('click', () => {
-      if (currentLesson < pythonTheory.length - 1) {
-        currentLesson++;
-        loadLesson();
-      } else {
-        showQuiz();
-      }
-    });
-
-    const loadLesson = () => {
-      lessonTitle.textContent = pythonTheory[currentLesson].title;
-      lessonContent.textContent = pythonTheory[currentLesson].content;
-    };
-
-    const showQuiz = () => {
-      courseContent.classList.add('hidden');
-      quizSection.classList.remove('hidden');
-      quizContent.innerHTML = "";
-      pythonQuiz.forEach((question, index) => {
-        const questionElement = document.createElement('div');
-        questionElement.innerHTML = `<p class="font-bold mb-2">${question.question}</p>`;
-        question.options.forEach((option, i) => {
-          const btn = document.createElement('button');
-          btn.textContent = option;
-          btn.classList.add('w-full', 'py-2', 'px-4', 'bg-gray-800', 'text-white', 'rounded', 'mb-2', 'hover:bg-gray-700', 'focus:outline-none', 'focus:ring-2', 'focus:ring-gold');
-          btn.addEventListener('click', () => handleQuizSubmit(i, question.correctAnswer));
-          questionElement.appendChild(btn);
-        });
-        quizContent.appendChild(questionElement);
-      });
-    };
-
-    const handleQuizSubmit = (selectedAnswer, correctAnswer) => {
-      if (selectedAnswer === correctAnswer) {
-        coins += 10;
-        quizScore++;
-      }
-      if (quizScore === pythonQuiz.length) {
-        level++;
-        resetApp();
-      }
-    };
-
-    const resetApp = () => {
-      quizSection.classList.add('hidden');
-      courseSelection.classList.remove('hidden');
-      levelDisplay.textContent = level;
-      coinsDisplay.textContent = coins;
-      currentLesson = 0;
-      quizScore = 0;
-    };
-  </script>
-
 </body>
 </html>
