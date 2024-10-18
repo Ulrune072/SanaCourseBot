@@ -1,5 +1,5 @@
-Django==3.x
-aiogram==3.x
+Django==4.2.7
+aiogram==3.13.1
 gunicorn
 python-dotenv
 dj-database-url
