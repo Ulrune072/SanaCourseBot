@@ -71,7 +71,7 @@
                     @click="handleNextLesson"
                     class="w-full py-3 bg-gold text-black font-bold rounded-lg transition-transform transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-gold focus:ring-opacity-50"
                 >
-                    {{ currentLessonIndex < pythonTheory[language].length - 1 ? t.nextLesson : t.takeQuiz }}
+                    { currentLessonIndex < pythonTheory[language].length - 1 ? t.nextLesson : t.takeQuiz }
                 </button>
             </div>
             <div v-if="showQuiz" class="space-y-4">
@@ -92,7 +92,7 @@
                     </button>
                 </div>
                 <div v-if="answeredQuestions.size === pythonQuiz[language].length" class="text-center text-gold">
-                    <p>{{ t.quizCompleted }} {{ quizScore * 10 }} {{ t.coinsEarned }} {{ level }}!</p>
+                <p>{{ t.quizCompleted }} { quizScore * 10 } {{ t.coinsEarned }} {{ level }}!</p>
                 </div>
             </div>
         </div>
@@ -108,189 +108,183 @@
             }
         }
     </script>
-    <script >
+    <script>
         const translations = {
-  en: {
-    user: "User",
-    level: "Level",
-    coins: "Coins",
-    course1: "Course 1: Python Basics",
-    course2: "Course 2 (Coming Soon)",
-    course3: "Course 3 (Coming Soon)",
-    nextLesson: "Next Lesson",
-    takeQuiz: "Take Quiz",
-    pythonQuiz: "Python Quiz",
-    quizCompleted: "Quiz completed! You earned",
-    coinsEarned: "coins and advanced to level",
-    tryAgain: "Try again",
-    languageSelect: "Select Language",
-  },
-  ru: {
-    user: "Пользователь",
-    level: "Уровень",
-    coins: "Монеты",
-    course1: "Курс 1: Основы Python",
-    course2: "Курс 2 (Скоро)",
-    course3: "Курс 3 (Скоро)",
-    nextLesson: "Следующий урок",
-    takeQuiz: "Пройти тест",
-    pythonQuiz: "Тест по Python",
-    quizCompleted: "Тест завершен! Вы заработали",
-    coinsEarned: "монет и достигли уровня",
-    tryAgain: "Попробовать снова",
-    languageSelect: "Выберите язык",
-  }
-};
-
-const pythonTheory = {
-  en: [
-    { id: 1, title: "Introduction to Python", content: "Python is a high-level, interpreted programming language..." },
-    { id: 2, title: "Variables and Data Types", content: "In Python, variables are created when you assign a value to them..." },
-    { id: 3, title: "Control Structures", content: "Python uses indentation to define code blocks for control structures like if, for, and while..." },
-  ],
-  ru: [
-    { id: 1, title: "Введение в Python", content: "Python - это высокоуровневый интерпретируемый язык программирования..." },
-    { id: 2, title: "Переменные и типы данных", content: "В Python переменные создаются при присвоении им значения..." },
-    { id: 3, title: "Управляющие конструкции", content: "Python использует отступы для определения блоков кода в управляющих конструкциях, таких как if, for и while..." },
-  ]
-};
-
-const pythonQuiz = {
-  en: [
-    {
-      question: "What is Python?",
-      options: ["A snake", "A programming language", "A type of coffee", "A planet"],
-      correctAnswer: 1
-    },
-    {
-      question: "Which of the following is a valid variable name in Python?",
-      options: ["2variable", "_variable", "variable-name", "variable name"],
-      correctAnswer: 1
-    },
-    {
-      question: "How do you create a comment in Python?",
-      options: ["// This is a comment", "/* This is a comment */", "# This is a comment", "-- This is a comment"],
-      correctAnswer: 2
-    }
-  ],
-  ru: [
-    {
-      question: "Что такое Python?",
-      options: ["Змея", "Язык программирования", "Вид кофе", "Планета"],
-      correctAnswer: 1
-    },
-    {
-      question: "Какое из следующих имен переменных допустимо в Python?",
-      options: ["2переменная", "_переменная", "переменная-имя", "переменная имя"],
-      correctAnswer: 1
-    },
-    {
-      question: "Как создать комментарий в Python?",
-      options: ["// Это комментарий", "/* Это комментарий */", "# Это комментарий", "-- Это комментарий"],
-      correctAnswer: 2
-    }
-  ]
-};
-
-const { createApp, ref, computed } = Vue;
-const { Globe, User } = LucideVueNext;
-
-createApp({
-  components: {
-    'lucide-globe': Globe,
-    'lucide-user': User
-  },
-  setup() {
-    const name = ref("User");
-    const level = ref(1);
-    const coins = ref(0);
-    const avatar = ref(null);
-    const showCourse = ref(false);
-    const currentLessonIndex = ref(0);
-    const showQuiz = ref(false);
-    const quizScore = ref(0);
-    const language = ref('en');
-    const answeredQuestions = ref(new Set());
-
-    const t = computed(() => translations[language.value]);
-    const currentLesson = computed(() => pythonTheory[language.value][currentLessonIndex.value]);
-
-    const toggleLanguage = () => {
-      language.value = language.value === 'en' ? 'ru' : 'en';
-    };
-
-    const handleFileUpload = (event) => {
-      const file = event.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          avatar.value = reader.result;
+          en: {
+            user: "User",
+            level: "Level",
+            coins: "Coins",
+            course1: "Course 1: Python Basics",
+            course2: "Course 2 (Coming Soon)",
+            course3: "Course 3 (Coming Soon)",
+            nextLesson: "Next Lesson",
+            takeQuiz: "Take Quiz",
+            pythonQuiz: "Python Quiz",
+            quizCompleted: "Quiz completed! You earned",
+            coinsEarned: "coins and advanced to level",
+            tryAgain: "Try again",
+            languageSelect: "Select Language",
+          },
+          ru: {
+            user: "Пользователь",
+            level: "Уровень",
+            coins: "Монеты",
+            course1: "Курс 1: Основы Python",
+            course2: "Курс 2 (Скоро)",
+            course3: "Курс 3 (Скоро)",
+            nextLesson: "Следующий урок",
+            takeQuiz: "Пройти тест",
+            pythonQuiz: "Тест по Python",
+            quizCompleted: "Тест завершен! Вы заработали",
+            coinsEarned: "монет и достигли уровня",
+            tryAgain: "Попробовать снова",
+            languageSelect: "Выберите язык",
+          }
         };
-        reader.readAsDataURL(file);
-      }
-    };
 
-    const handleCourseClick = () => {
-      showCourse.value = true;
-      currentLessonIndex.value = 0;
-      showQuiz.value = false;
-      answeredQuestions.value = new Set();
-    };
+        const pythonTheory = {
+          en: [
+            { id: 1, title: "Introduction to Python", content: "Python is a high-level, interpreted programming language..." },
+            { id: 2, title: "Variables and Data Types", content: "In Python, variables are created when you assign a value to them..." },
+            { id: 3, title: "Control Structures", content: "Python uses indentation to define code blocks for control structures like if, for, and while..." },
+          ],
+          ru: [
+            { id: 1, title: "Введение в Python", content: "Python - это высокоуровневый интерпретируемый язык программирования..." },
+            { id: 2, title: "Переменные и типы данных", content: "В Python переменные создаются при присвоении им значения..." },
+            { id: 3, title: "Управляющие конструкции", content: "Python использует отступы для определения блоков кода в управляющих конструкциях, таких как if, for и while..." },
+          ]
+        };
 
-    const handleNextLesson = () => {
-      if (currentLessonIndex.value < pythonTheory[language.value].length - 1) {
-        currentLessonIndex.value++;
-      } else {
-        showQuiz.value = true;
-      }
-    };
+        const pythonQuiz = {
+          en: [
+            {
+              question: "What is Python?",
+              options: ["A snake", "A programming language", "A type of coffee", "A planet"],
+              correctAnswer: 1
+            },
+            {
+              question: "Which of the following is a valid variable name in Python?",
+              options: ["2variable", "_variable", "variable-name", "variable name"],
+              correctAnswer: 1
+            },
+            {
+              question: "How do you create a comment in Python?",
+              options: ["// This is a comment", "/* This is a comment */", "# This is a comment", "-- This is a comment"],
+              correctAnswer: 2
+            }
+          ],
+          ru: [
+            {
+              question: "Что такое Python?",
+              options: ["Змея", "Язык программирования", "Вид кофе", "Планета"],
+              correctAnswer: 1
+            },
+            {
+              question: "Какое из следующих имен переменных допустимо в Python?",
+              options: ["2переменная", "_переменная", "переменная-имя", "переменная имя"],
+              correctAnswer: 1
+            },
+            {
+              question: "Как создать комментарий в Python?",
+              options: ["// Это комментарий", "/* Это комментарий */", "# Это комментарий", "-- Это комментарий"],
+              correctAnswer: 2
+            }
+          ]
+        };
 
-    const handleQuizSubmit = (questionIndex, selectedAnswer, correctAnswer) => {
-      if (!answeredQuestions.value.has(questionIndex)) {
-        if (selectedAnswer === correctAnswer) {
-          coins.value += 10;
-          quizScore.value++;
-        }
-        answeredQuestions.value.add(questionIndex);
-      }
+        const { createApp, ref, computed } = Vue;
+        const { Globe, User } = LucideVueNext;
 
-      if (answeredQuestions.value.size === pythonQuiz[language.value].length) {
-        level.value++;
-        setTimeout(() => {
-          showCourse.value = false;
-          showQuiz.value = false;
-          quizScore.value = 0;
-          answeredQuestions.value = new Set();
-        }, 3000);
-      }
-    };
+        createApp({
+          components: {
+            'lucide-globe': Globe,
+            'lucide-user': User
+          },
+          setup() {
+            const name = ref("User");
+            const level = ref(1);
+            const coins = ref(0);
+            const avatar = ref(null);
+            const showCourse = ref(false);
+            const currentLessonIndex = ref(0);
+            const showQuiz = ref(false);
+            const quizScore = ref(0);
+            const language = ref('en');
+            const answeredQuestions = ref(new Set());
 
-    return {
-      name,
-      level,
-      coins,
-      avatar,
-      showCourse,
-      currentLessonIndex,
-      showQuiz,
-      quizScore,
-      language,
-      answeredQuestions,
-      t,
-      currentLesson,
-      pythonTheory,
-      pythonQuiz,
-      toggleLanguage,
-      handleFileUpload,
-      handleCourseClick,
-      handleNextLesson,
-      handleQuizSubmit
-    };
-  }
-}).mount('#app');
+            const t = computed(() => translations[language.value]);
+            const currentLesson = computed(() => pythonTheory[language.value][currentLessonIndex.value]);
 
+            const toggleLanguage = () => {
+              language.value = language.value === 'en' ? 'ru' : 'en';
+            };
+
+            const handleCourseClick = () => {
+              showCourse.value = true;
+              currentLessonIndex.value = 0;
+              showQuiz.value = false;
+            };
+
+            const handleNextLesson = () => {
+              if (currentLessonIndex.value < pythonTheory[language.value].length - 1) {
+                currentLessonIndex.value++;
+              } else {
+                showQuiz.value = true;
+              }
+            };
+
+            const handleQuizSubmit = (questionIndex, selectedAnswer, correctAnswer) => {
+              if (!answeredQuestions.value.has(questionIndex)) {
+                if (selectedAnswer === correctAnswer) {
+                  coins.value += 10;
+                  quizScore.value++;
+                }
+                answeredQuestions.value.add(questionIndex);
+              }
+
+              if (answeredQuestions.value.size === pythonQuiz[language.value].length) {
+                level.value++;
+                setTimeout(() => {
+                  showCourse.value = false;
+                  showQuiz.value = false;
+                  quizScore.value = 0;
+                  answeredQuestions.value = new Set();
+                }, 3000);
+              }
+            };
+
+            const handleFileUpload = (event) => {
+              const file = event.target.files[0];
+              if (file) {
+                const reader = new FileReader();
+                reader.onloadend = () => {
+                  avatar.value = reader.result;
+                };
+                reader.readAsDataURL(file);
+              }
+            };
+
+            return {
+              name,
+              level,
+              coins,
+              avatar,
+              showCourse,
+              currentLessonIndex,
+              showQuiz,
+              quizScore,
+              language,
+              answeredQuestions,
+              t,
+              currentLesson,
+              toggleLanguage,
+              handleCourseClick,
+              handleNextLesson,
+              handleQuizSubmit,
+              handleFileUpload
+            };
+          }
+        }).mount('#app');
     </script>
-
-
 </body>
 </html>
