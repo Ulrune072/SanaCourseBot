@@ -4,184 +4,293 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Python Learning App</title>
-    <style>
-        body {
-            background-color: black;
-            color: white;
-            font-family: Arial, sans-serif;
-        }
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #1a1a1a;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-        .btn {
-            display: inline-block;
-            padding: 10px 20px;
-            color: white;
-            background-color: gold;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            text-align: center;
-            font-weight: bold;
-            width: 100%;
-            margin-bottom: 10px;
-        }
-        .btn:disabled {
-            background-color: grey;
-            cursor: not-allowed;
-        }
-        .avatar {
-            width: 80px;
-            height: 80px;
-            background-color: grey;
-            border-radius: 50%;
-            margin-bottom: 20px;
-            overflow: hidden;
-        }
-        .avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        .level, .coins {
-            font-size: 18px;
-            font-weight: bold;
-            color: gold;
-            text-align: center;
-        }
-        .question {
-            margin-bottom: 20px;
-        }
-    </style>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/vue@3.2.31/dist/vue.global.prod.js"></script>
+    <script src="https://unpkg.com/lucide-vue-next"></script>
 </head>
-<body>
-
-<div class="container">
-    <!-- Логика выбора языка -->
-    <div class="language-select">
-        <button id="toggleLanguage" class="btn">Select Language</button>
-    </div>
-    <input type="file" id="fileInput" style="display: none;">
-    <h2 class="username" id="username">User</h2>
-
-    <!-- Уровень и монеты -->
-    <div class="level">
-        <p id="level">Level: 1</p>
-    </div>
-    <div class="coins">
-        <p id="coins">Coins: 0</p>
-    </div>
-
-    <!-- Курсы и викторина -->
-    <div id="courses">
-        <button class="btn" onclick="startCourse(1)">Course 1: Python Basics</button>
-        <button class="btn" disabled>Course 2 (Coming Soon)</button>
-        <button class="btn" disabled>Course 3 (Coming Soon)</button>
-    </div>
-
-    <!-- Викторина -->
-    <div id="quiz" style="display: none;">
-        <div class="question">
-            <p id="questionText"></p>
+<body class="bg-gray-900 text-white">
+    <div id="app" class="flex justify-center items-center min-h-screen">
+        <div class="w-full max-w-md p-6 bg-gray-800 rounded-lg shadow-lg">
+            <div class="flex justify-end mb-4">
+                <button @click="toggleLanguage" class="flex items-center text-gold">
+                    <lucide-globe class="w-5 h-5 mr-1"></lucide-globe>
+                    {{ t.languageSelect }}
+                </button>
+            </div>
+            <div class="flex flex-col items-center mb-6">
+                <div
+                    class="w-20 h-20 bg-gray-700 rounded-full flex items-center justify-center mb-2 overflow-hidden cursor-pointer"
+                    @click="$refs.fileInput.click()"
+                >
+                    <img v-if="avatar" :src="avatar" alt="User Avatar" class="w-full h-full object-cover">
+                    <lucide-user v-else class="w-12 h-12 text-gold"></lucide-user>
+                </div>
+                <input
+                    type="file"
+                    ref="fileInput"
+                    @change="handleFileUpload"
+                    class="hidden"
+                    accept="image/*"
+                >
+                <h2 class="text-2xl font-bold text-gold">{{ name }}</h2>
+            </div>
+            <div class="flex justify-between mb-6">
+                <div class="text-center">
+                    <p class="text-sm text-gray-400">{{ t.level }}</p>
+                    <p class="text-xl font-bold">{{ level }}</p>
+                </div>
+                <div class="text-center">
+                    <p class="text-sm text-gray-400">{{ t.coins }}</p>
+                    <p class="text-xl font-bold">{{ coins }}</p>
+                </div>
+            </div>
+            <div v-if="!showCourse" class="space-y-4">
+                <button
+                    @click="handleCourseClick"
+                    class="w-full py-3 bg-gold text-black font-bold rounded-lg transition-transform transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-gold focus:ring-opacity-50"
+                >
+                    {{ t.course1 }}
+                </button>
+                <button
+                    class="w-full py-3 bg-gray-700 text-white font-bold rounded-lg transition-transform transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50"
+                    disabled
+                >
+                    {{ t.course2 }}
+                </button>
+                <button
+                    class="w-full py-3 bg-gray-700 text-white font-bold rounded-lg transition-transform transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50"
+                    disabled
+                >
+                    {{ t.course3 }}
+                </button>
+            </div>
+            <div v-if="showCourse && !showQuiz" class="space-y-4">
+                <h3 class="text-xl font-bold">{{ currentLesson.title }}</h3>
+                <p>{{ currentLesson.content }}</p>
+                <button
+                    @click="handleNextLesson"
+                    class="w-full py-3 bg-gold text-black font-bold rounded-lg transition-transform transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-gold focus:ring-opacity-50"
+                >
+                    {{ currentLessonIndex < pythonTheory[language].length - 1 ? t.nextLesson : t.takeQuiz }}
+                </button>
+            </div>
+            <div v-if="showQuiz" class="space-y-4">
+                <h3 class="text-xl font-bold">{{ t.pythonQuiz }}</h3>
+                <div v-for="(question, index) in pythonQuiz[language]" :key="index" class="mb-4">
+                    <p class="font-bold mb-2">{{ question.question }}</p>
+                    <button
+                        v-for="(option, optionIndex) in question.options"
+                        :key="optionIndex"
+                        @click="handleQuizSubmit(index, optionIndex, question.correctAnswer)"
+                        :class="[
+                            'w-full py-2 px-4 bg-gray-700 text-white rounded mb-2 hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gold focus:ring-opacity-50',
+                            { 'opacity-50 cursor-not-allowed': answeredQuestions.has(index) }
+                        ]"
+                        :disabled="answeredQuestions.has(index)"
+                    >
+                        {{ option }}
+                    </button>
+                </div>
+                <div v-if="answeredQuestions.size === pythonQuiz[language].length" class="text-center text-gold">
+                    <p>{{ t.quizCompleted }} {{ quizScore * 10 }} {{ t.coinsEarned }} {{ level }}!</p>
+                </div>
+            </div>
         </div>
-        <div id="optionsContainer"></div>
     </div>
-
-    <div id="quizResults" style="display: none;">
-        <p id="quizCompletedMessage"></p>
-    </div>
-
-</div>
-
-<!-- JavaScript -->
-<script>
-    const translations = {
-        en: {
-            user: "User",
-            level: "Level",
-            coins: "Coins",
-            course1: "Course 1: Python Basics",
-            course2: "Course 2 (Coming Soon)",
-            course3: "Course 3 (Coming Soon)",
-            nextLesson: "Next Lesson",
-            takeQuiz: "Take Quiz",
-            pythonQuiz: "Python Quiz",
-            quizCompleted: "Quiz completed! You earned",
-            coinsEarned: "coins and advanced to level",
-            tryAgain: "Try again",
-            languageSelect: "Select Language",
-        },
-        ru: {
-            user: "Пользователь",
-            level: "Уровень",
-            coins: "Монеты",
-            course1: "Курс 1: Основы Python",
-            course2: "Курс 2 (Скоро)",
-            course3: "Курс 3 (Скоро)",
-            nextLesson: "Следующий урок",
-            takeQuiz: "Пройти тест",
-            pythonQuiz: "Тест по Python",
-            quizCompleted: "Тест завершен! Вы заработали",
-            coinsEarned: "монет и достигли уровня",
-            tryAgain: "Попробовать снова",
-            languageSelect: "Выберите язык",
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        gold: '#B8860B',
+                    }
+                }
+            }
         }
+    </script>
+    <script >
+        const translations = {
+  en: {
+    user: "User",
+    level: "Level",
+    coins: "Coins",
+    course1: "Course 1: Python Basics",
+    course2: "Course 2 (Coming Soon)",
+    course3: "Course 3 (Coming Soon)",
+    nextLesson: "Next Lesson",
+    takeQuiz: "Take Quiz",
+    pythonQuiz: "Python Quiz",
+    quizCompleted: "Quiz completed! You earned",
+    coinsEarned: "coins and advanced to level",
+    tryAgain: "Try again",
+    languageSelect: "Select Language",
+  },
+  ru: {
+    user: "Пользователь",
+    level: "Уровень",
+    coins: "Монеты",
+    course1: "Курс 1: Основы Python",
+    course2: "Курс 2 (Скоро)",
+    course3: "Курс 3 (Скоро)",
+    nextLesson: "Следующий урок",
+    takeQuiz: "Пройти тест",
+    pythonQuiz: "Тест по Python",
+    quizCompleted: "Тест завершен! Вы заработали",
+    coinsEarned: "монет и достигли уровня",
+    tryAgain: "Попробовать снова",
+    languageSelect: "Выберите язык",
+  }
+};
+
+const pythonTheory = {
+  en: [
+    { id: 1, title: "Introduction to Python", content: "Python is a high-level, interpreted programming language..." },
+    { id: 2, title: "Variables and Data Types", content: "In Python, variables are created when you assign a value to them..." },
+    { id: 3, title: "Control Structures", content: "Python uses indentation to define code blocks for control structures like if, for, and while..." },
+  ],
+  ru: [
+    { id: 1, title: "Введение в Python", content: "Python - это высокоуровневый интерпретируемый язык программирования..." },
+    { id: 2, title: "Переменные и типы данных", content: "В Python переменные создаются при присвоении им значения..." },
+    { id: 3, title: "Управляющие конструкции", content: "Python использует отступы для определения блоков кода в управляющих конструкциях, таких как if, for и while..." },
+  ]
+};
+
+const pythonQuiz = {
+  en: [
+    {
+      question: "What is Python?",
+      options: ["A snake", "A programming language", "A type of coffee", "A planet"],
+      correctAnswer: 1
+    },
+    {
+      question: "Which of the following is a valid variable name in Python?",
+      options: ["2variable", "_variable", "variable-name", "variable name"],
+      correctAnswer: 1
+    },
+    {
+      question: "How do you create a comment in Python?",
+      options: ["// This is a comment", "/* This is a comment */", "# This is a comment", "-- This is a comment"],
+      correctAnswer: 2
+    }
+  ],
+  ru: [
+    {
+      question: "Что такое Python?",
+      options: ["Змея", "Язык программирования", "Вид кофе", "Планета"],
+      correctAnswer: 1
+    },
+    {
+      question: "Какое из следующих имен переменных допустимо в Python?",
+      options: ["2переменная", "_переменная", "переменная-имя", "переменная имя"],
+      correctAnswer: 1
+    },
+    {
+      question: "Как создать комментарий в Python?",
+      options: ["// Это комментарий", "/* Это комментарий */", "# Это комментарий", "-- Это комментарий"],
+      correctAnswer: 2
+    }
+  ]
+};
+
+const { createApp, ref, computed } = Vue;
+const { Globe, User } = LucideVueNext;
+
+createApp({
+  components: {
+    'lucide-globe': Globe,
+    'lucide-user': User
+  },
+  setup() {
+    const name = ref("User");
+    const level = ref(1);
+    const coins = ref(0);
+    const avatar = ref(null);
+    const showCourse = ref(false);
+    const currentLessonIndex = ref(0);
+    const showQuiz = ref(false);
+    const quizScore = ref(0);
+    const language = ref('en');
+    const answeredQuestions = ref(new Set());
+
+    const t = computed(() => translations[language.value]);
+    const currentLesson = computed(() => pythonTheory[language.value][currentLessonIndex.value]);
+
+    const toggleLanguage = () => {
+      language.value = language.value === 'en' ? 'ru' : 'en';
     };
 
-    let language = 'en';
-    let currentQuizIndex = 0;
-    const pythonQuiz = {
-        en: [
-            { question: "What is Python?", options: ["A snake", "A programming language"], correct: 1 },
-        ],
-        ru: [
-            { question: "Что такое Python?", options: ["Змея", "Язык программирования"], correct: 1 },
-        ]
+    const handleFileUpload = (event) => {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          avatar.value = reader.result;
+        };
+        reader.readAsDataURL(file);
+      }
     };
 
-    document.getElementById('toggleLanguage').addEventListener('click', toggleLanguage);
+    const handleCourseClick = () => {
+      showCourse.value = true;
+      currentLessonIndex.value = 0;
+      showQuiz.value = false;
+      answeredQuestions.value = new Set();
+    };
 
-    function toggleLanguage() {
-        language = language === 'en' ? 'ru' : 'en';
-        document.getElementById('toggleLanguage').textContent = translations[language].languageSelect;
-        document.getElementById('username').textContent = translations[language].user;
-        updateQuiz();
-    }
+    const handleNextLesson = () => {
+      if (currentLessonIndex.value < pythonTheory[language.value].length - 1) {
+        currentLessonIndex.value++;
+      } else {
+        showQuiz.value = true;
+      }
+    };
 
-    function startCourse() {
-        document.getElementById('courses').style.display = 'none';
-        document.getElementById('quiz').style.display = 'block';
-        updateQuiz();
-    }
-
-    function updateQuiz() {
-        const quizData = pythonQuiz[language][currentQuizIndex];
-        document.getElementById('questionText').textContent = quizData.question;
-
-        const optionsContainer = document.getElementById('optionsContainer');
-        optionsContainer.innerHTML = '';
-        quizData.options.forEach((option, index) => {
-            const button = document.createElement('button');
-            button.textContent = option;
-            button.classList.add('btn');
-            button.onclick = () => checkAnswer(index, quizData.correct);
-            optionsContainer.appendChild(button);
-        });
-    }
-
-    function checkAnswer(selected, correct) {
-        if (selected === correct) {
-            alert('Correct!');
-        } else {
-            alert('Wrong!');
+    const handleQuizSubmit = (questionIndex, selectedAnswer, correctAnswer) => {
+      if (!answeredQuestions.value.has(questionIndex)) {
+        if (selectedAnswer === correctAnswer) {
+          coins.value += 10;
+          quizScore.value++;
         }
-    }
-</script>
+        answeredQuestions.value.add(questionIndex);
+      }
+
+      if (answeredQuestions.value.size === pythonQuiz[language.value].length) {
+        level.value++;
+        setTimeout(() => {
+          showCourse.value = false;
+          showQuiz.value = false;
+          quizScore.value = 0;
+          answeredQuestions.value = new Set();
+        }, 3000);
+      }
+    };
+
+    return {
+      name,
+      level,
+      coins,
+      avatar,
+      showCourse,
+      currentLessonIndex,
+      showQuiz,
+      quizScore,
+      language,
+      answeredQuestions,
+      t,
+      currentLesson,
+      pythonTheory,
+      pythonQuiz,
+      toggleLanguage,
+      handleFileUpload,
+      handleCourseClick,
+      handleNextLesson,
+      handleQuizSubmit
+    };
+  }
+}).mount('#app');
+
+    </script>
+
 
 </body>
 </html>
