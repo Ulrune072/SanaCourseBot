@@ -32,4 +32,4 @@ class Answer(models.Model):
     is_correct = models.BooleanField(default=False)
 
     def __str__(self):
-        self.answer_text
+        return self.answer_text
