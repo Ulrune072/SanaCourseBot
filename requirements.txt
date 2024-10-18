@@ -3,3 +3,4 @@ aiogram==3.13.1
 gunicorn
 python-dotenv
 dj-database-url
+whitenoise
