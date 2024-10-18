@@ -80,7 +80,7 @@
                     @click="handleNextLesson"
                     class="w-full py-3 bg-gold text-black font-bold rounded-lg transition-transform transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-gold focus:ring-opacity-50"
                 >
-                    {{ currentLessonIndex < pythonTheory[language].length - 1 ? t.nextLesson : t.takeQuiz }}
+                    {% verbatim %}{{ currentLessonIndex < pythonTheory[language].length - 1 ? t.nextLesson : t.takeQuiz }}{% endverbatim %}
                 </button>
             </div>
 
