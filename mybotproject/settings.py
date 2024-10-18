@@ -131,4 +131,5 @@ MIDDLEWARE = [
     # другие middleware
     'whitenoise.middleware.WhiteNoiseMiddleware',
     # остальные middleware
+
 ]

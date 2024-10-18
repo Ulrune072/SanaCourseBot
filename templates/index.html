@@ -3,23 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Telegram Mini App</title>
-    <link rel="stylesheet" href="/static/style.css">
+    <title>Mini App</title>
 </head>
 <body>
-    <h1>Мини-приложение для Telegram</h1>
-    <p>Нажмите кнопку, чтобы отправить сообщение боту.</p>
-    <button id="sendMessageBtn">Отправить сообщение</button>
+    <h1>Добро пожаловать!</h1>
+    <p id="username"></p>
 
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script>
+        // Инициализируем WebApp
         const tg = window.Telegram.WebApp;
 
-        document.getElementById('sendMessageBtn').addEventListener('click', () => {
-            tg.sendData("Привет от мини-приложения!");
-            tg.close();
-        });
+        // Получаем информацию о пользователе
+        const user = tg.initDataUnsafe.user;
+        if (user) {
+            document.getElementById('username').textContent = `Ваше имя в Telegram: ${user.username}`;
+        } else {
+            document.getElementById('username').textContent = 'Не удалось получить имя пользователя.';
+        }
 
-        tg.ready();
+        // Открытие WebApp
+        tg.expand(); // Разворачивает WebApp
     </script>
 </body>
 </html>
