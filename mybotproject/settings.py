@@ -28,7 +28,7 @@ SECRET_KEY = 'django-insecure-54%=jhtegvxzd+_gu^pfs*wj7e6)cs*z3kv*hu%z84(+by-4tn
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS')
+ALLOWED_HOSTS = os.getenv('*')
 
 
 
@@ -41,6 +41,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'mybotproject',
+    'telegrambot',
 ]
 
 MIDDLEWARE = [
