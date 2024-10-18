@@ -32,7 +32,7 @@ async def send_welcome(message: types.Message):
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
         [
             InlineKeyboardButton(text="Открыть мини-приложение",
-                                 web_app=types.WebAppInfo(url="https://your-domain.com")),
+                                 web_app=types.WebAppInfo(url="https://saracoursebot.com")),
         ],
         [
             InlineKeyboardButton(text="Получить информацию о курсах", callback_data="info_courses"),

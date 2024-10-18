@@ -28,7 +28,8 @@ SECRET_KEY = 'django-insecure-54%=jhtegvxzd+_gu^pfs*wj7e6)cs*z3kv*hu%z84(+by-4tn
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['sanacoursebpt.com']
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'sanacoursebot.com']
+
 
 
 # Application definition
@@ -83,6 +84,7 @@ DATABASES = {
         default=os.getenv('DATABASE_URL', 'postgres://uc0rgr7j3uoqo5:p817e9ccadd52adf92f6f0cbe78a68df21371bfea093b014cf8e91e45794a3a06@c6sfjnr30ch74e.cluster-czrs8kj4isg7.us-east-1.rds.amazonaws.com:5432/d1p96t5j63dhv')
     )
 }
+DATABASES['default'] = dj_database_url.config(conn_max_age=600, ssl_require=True)
 
 
 # Password validation
