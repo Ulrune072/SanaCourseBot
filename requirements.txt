@@ -1,0 +1,5 @@
+Django==3.x
+aiogram==3.x
+gunicorn
+python-dotenv
+dj-database-url
