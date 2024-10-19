@@ -13,7 +13,7 @@
         <div class="w-full max-w-md p-6 bg-gray-800 rounded-lg shadow-lg">
             <!-- Language selection -->
             <div class="flex justify-end mb-4">
-                <button @click="toggleLanguage" class="flex items-center text-gold">
+                <button @click="toggleLanguage" class="flex items-center text-gray-300">
                     <lucide-globe class="w-5 h-5 mr-1"></lucide-globe>
                     {{ t.languageSelect }}
                 </button>
@@ -35,7 +35,7 @@
                     class="hidden"
                     accept="image/*"
                 >
-                <h2 class="text-2xl font-bold text-gold">{{ name }}</h2>
+                <h2 class="text-2xl font-bold text-gray-300">{{ name }}</h2>
             </div>
 
             <!-- Level and coins -->
@@ -74,8 +74,8 @@
 
             <!-- Lesson content -->
             <div v-if="showCourse && !showQuiz" class="space-y-4">
-                <h3 class="text-xl font-bold">{{ currentLesson.title }}</h3>
-                <p>{{ currentLesson.content }}</p>
+                <h3 class="text-xl font-bold text-gray-300">{{ currentLesson.title }}</h3>
+                <p class="text-gray-400">{{ currentLesson.content }}</p>
                 <button
                     @click="handleNextLesson"
                     class="w-full py-3 bg-gold text-black font-bold rounded-lg transition-transform transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-gold focus:ring-opacity-50"
@@ -86,9 +86,9 @@
 
             <!-- Quiz content -->
             <div v-if="showQuiz" class="space-y-4">
-                <h3 class="text-xl font-bold">{{ t.pythonQuiz }}</h3>
+                <h3 class="text-xl font-bold text-gray-300">{{ t.pythonQuiz }}</h3>
                 <div v-for="(question, index) in pythonQuiz[language]" :key="index" class="mb-4">
-                    <p class="font-bold mb-2">{{ question.question }}</p>
+                    <p class="font-bold mb-2 text-gray-300">{{ question.question }}</p>
                     <button
                         v-for="(option, optionIndex) in question.options"
                         :key="optionIndex"
@@ -206,101 +206,59 @@
             ]
         };
 
-        const { createApp, ref, computed } = Vue;
-        const { Globe, User } = LucideVueNext;
-
-        createApp({
-            components: {
-                'lucide-globe': Globe,
-                'lucide-user': User
+        const app = Vue.createApp({
+            data() {
+                return {
+                    name: "Mой лорд",
+                    avatar: null,
+                    level: 1,
+                    coins: 10,
+                    currentLessonIndex: 0,
+                    showCourse: false,
+                    showQuiz: false,
+                    answeredQuestions: new Set(),
+                    language: "en",
+                    translations,
+                    pythonTheory,
+                    pythonQuiz
+                };
             },
-            setup() {
-                const name = ref("User");
-                const level = ref(1);
-                const coins = ref(0);
-                const avatar = ref(null);
-                const language = ref('en');
-                const showCourse = ref(false);
-                const showQuiz = ref(false);
-                const currentLessonIndex = ref(0);
-                const answeredQuestions = ref(new Set());
-                const quizScore = ref(0);
-
-                const t = computed(() => translations[language.value]);
-                const currentLesson = computed(() => pythonTheory[language.value][currentLessonIndex.value]);
-
-                const toggleLanguage = () => {
-                    language.value = language.value === 'en' ? 'ru' : 'en';
-                };
-
-                const handleCourseClick = () => {
-                    showCourse.value = true;
-                    showQuiz.value = false;
-                    currentLessonIndex.value = 0;
-                    answeredQuestions.value.clear();
-                    quizScore.value = 0;
-                };
-
-                const handleNextLesson = () => {
-                    if (currentLessonIndex.value < pythonTheory[language.value].length - 1) {
-                        currentLessonIndex.value++;
+            computed: {
+                t() {
+                    return this.translations[this.language];
+                },
+                currentLesson() {
+                    return this.pythonTheory[this.language][this.currentLessonIndex];
+                }
+            },
+            methods: {
+                toggleLanguage() {
+                    this.language = this.language === "en" ? "ru" : "en";
+                },
+                handleCourseClick() {
+                    this.showCourse = true;
+                    this.showQuiz = false;
+                },
+                handleNextLesson() {
+                    if (this.currentLessonIndex < this.pythonTheory[this.language].length - 1) {
+                        this.currentLessonIndex++;
                     } else {
-                        showQuiz.value = true;
+                        this.showQuiz = true;
+                        this.showCourse = false;
                     }
-                };
-
-                const handleQuizSubmit = (questionIndex, optionIndex, correctAnswer) => {
-                    if (!answeredQuestions.value.has(questionIndex)) {
-                        answeredQuestions.value.add(questionIndex);
+                },
+                handleQuizSubmit(questionIndex, optionIndex, correctAnswer) {
+                    if (!this.answeredQuestions.has(questionIndex)) {
+                        this.answeredQuestions.add(questionIndex);
                         if (optionIndex === correctAnswer) {
-                            quizScore.value++;
-                            coins.value += 10;
+                            this.quizScore++;
                         }
                     }
-
-                    if (answeredQuestions.value.size === pythonQuiz[language.value].length) {
-                        level.value++;
-                        setTimeout(() => {
-                            showCourse.value = false;
-                            showQuiz.value = false;
-                        }, 3000);
-                    }
-                };
-
-                const handleFileUpload = (event) => {
-                    const file = event.target.files[0];
-                    if (file) {
-                        const reader = new FileReader();
-                        reader.onloadend = () => {
-                            avatar.value = reader.result;
-                        };
-                        reader.readAsDataURL(file);
-                    }
-                };
-
-                return {
-                    name,
-                    level,
-                    coins,
-                    avatar,
-                    language,
-                    showCourse,
-                    showQuiz,
-                    currentLessonIndex,
-                    answeredQuestions,
-                    quizScore,
-                    t,
-                    currentLesson,
-                    pythonTheory,
-                    pythonQuiz,
-                    toggleLanguage,
-                    handleCourseClick,
-                    handleNextLesson,
-                    handleQuizSubmit,
-                    handleFileUpload
-                };
+                }
             }
-        }).mount('#app');
+        });
+
+        app.mount("#app");
     </script>
 </body>
 </html>
