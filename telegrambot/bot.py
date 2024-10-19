@@ -17,7 +17,6 @@ logging.basicConfig(level=logging.INFO)
 bot = Bot(token=API_TOKEN)
 dp = Dispatcher()
 
-
 # Обработчик команды /start
 @dp.message(Command("start"))
 async def send_welcome(message: types.Message):
@@ -28,11 +27,18 @@ async def send_welcome(message: types.Message):
         "Выберите нужное действие с помощью кнопок ниже:"
     )
 
+    # Получаем имя пользователя Telegram
+    username = message.from_user.username
+
     # Создаем инлайн-кнопки
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
         [
-            InlineKeyboardButton(text="Открыть мини-приложение",
-                                 web_app=types.WebAppInfo(url="https://saracoursebot.com")),
+            InlineKeyboardButton(
+                text="Открыть мини-приложение",
+                web_app=types.WebAppInfo(
+                    url=f"https://saracoursebot.com?username={username}"
+                )
+            ),
         ],
         [
             InlineKeyboardButton(text="Получить информацию о курсах", callback_data="info_courses"),
@@ -44,13 +50,11 @@ async def send_welcome(message: types.Message):
 
     await message.answer(welcome_text, reply_markup=keyboard)
 
-
 # Обработчик данных из мини-приложения
 @dp.message(lambda message: message.web_app_data)
 async def handle_web_app_data(message: types.Message):
     data = message.web_app_data.data
     await message.answer(f"Вы отправили данные из мини-приложения: {data}")
-
 
 # Обработчик нажатия на инлайн-кнопки
 @dp.callback_query()
@@ -60,11 +64,9 @@ async def handle_callback(query: types.CallbackQuery):
     elif query.data == "contact_admin":
         await query.answer("Вы можете написать администратору на @admin_username.")
 
-
 async def main():
     # Регистрация диспетчера с ботом
     await dp.start_polling(bot)
-
 
 if __name__ == '__main__':
     asyncio.run(main())
