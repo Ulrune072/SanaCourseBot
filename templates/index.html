@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Python Learning App</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@3.3.2/dist/tailwind.min.css" rel="stylesheet">
     <script src="https://unpkg.com/vue@3.2.31/dist/vue.global.prod.js"></script>
     <script src="https://unpkg.com/lucide-vue-next"></script>
 </head>
@@ -15,6 +16,7 @@
             <div class="flex justify-end mb-4">
                 <button @click="toggleLanguage" class="flex items-center text-gray-300">
                     <lucide-globe class="w-5 h-5 mr-1"></lucide-globe>
+                    condole.log(t.languageSelect);
                     {{ t.languageSelect }}
                 </button>
             </div>
