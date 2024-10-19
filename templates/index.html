@@ -104,7 +104,7 @@
                 </div>
                 <!-- Quiz completion message -->
                 <div v-if="answeredQuestions.size === pythonQuiz[language].length" class="text-center text-gold">
-                    <p>{{ t.quizCompleted }} {{ quizScore * 10 }} {{ t.coinsEarned }} {{ level }}</p>
+                        <p>{% verbatim %}{{ t.quizCompleted }} {{ quizScore * 10 }} {{ t.coinsEarned }} {{ level }}{% endverbatim %}</p>
                 </div>
             </div>
         </div>
