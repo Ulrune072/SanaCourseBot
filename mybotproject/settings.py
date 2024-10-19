@@ -47,7 +47,6 @@ INSTALLED_APPS = [
     'mybotproject',
     'telegrambot',
     'tailwind',
-    'theme',
 ]
 
 MIDDLEWARE = [
